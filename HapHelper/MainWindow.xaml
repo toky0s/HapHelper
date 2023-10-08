@@ -4,9 +4,11 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:HapHelper"
+        xmlns:local_2="clr-namespace:HapHelper"
         mc:Ignorable="d"
         xmlns:cvt="clr-namespace:HapHelper.Converters"
         xmlns:vm="clr-namespace:HapHelper"
+        Cursor="{Binding UI_Cursor}"
         Title="MainWindow" Height="450" Width="800">
     <Window.Resources>
         <cvt:InvertBooleanConverter x:Key="InvertBooleanConverter"></cvt:InvertBooleanConverter>
@@ -16,79 +18,75 @@
     </Window.DataContext>
     <Border IsEnabled="{Binding PopupSvc.IsOpen, Converter={StaticResource InvertBooleanConverter}}">
         <Grid>
-        <Popup Grid.Column="3" 
+            <Popup Grid.Column="3" 
                VerticalOffset="10"
                Placement="Relative"
                Width="300"
-               IsOpen="{Binding IsOpen}" 
-               DataContext="{Binding PopupSvc}">
-            <Border BorderBrush="Azure" 
+               IsOpen="{Binding PopupSvc.IsOpen}">
+                <Border BorderBrush="Azure" 
                     BorderThickness="1" 
                     Background="White">
-                <Grid Margin="5">
-                    <Grid.RowDefinitions>
-                        <RowDefinition></RowDefinition>
-                        <RowDefinition></RowDefinition>
-                    </Grid.RowDefinitions>
-                    <Grid Grid.Row="0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition></ColumnDefinition>
-                            <ColumnDefinition Width="Auto"></ColumnDefinition>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Text="{Binding PopupTitle}" 
-                                    Background="White"
-                                    Grid.Column="0"></TextBlock>
-                        <Button Content="x" 
-                            Width="20"
-                            Height="20"
-                            Command="{Binding ClosePopupCmd}"
-                            Grid.Column="1"></Button>
-                    </Grid>
-                    <StackPanel Grid.Row="1">
-                        <TextBlock Text="{Binding PopupCaption}" 
-                                    Background="White"
-                                    TextWrapping="WrapWithOverflow"></TextBlock>
-                        <Button Command="{Binding ClosePopupCmd}" Content="Cancel"></Button>
-                    </StackPanel>
-                </Grid>
-            </Border>
-        </Popup>
-        <TabControl TabStripPlacement="Left" 
-                    Grid.Column="0" 
-                    Margin="0, 0, 0, 10">
-            <TabItem Name="TabItem_HtmlSource" Header="HTML Source">
-                <TabItem.Content>
-                    <Grid>
+                    <Grid Margin="5">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"></RowDefinition>
                             <RowDefinition></RowDefinition>
-                            <RowDefinition Height="Auto"></RowDefinition>
+                            <RowDefinition></RowDefinition>
                         </Grid.RowDefinitions>
                         <Grid Grid.Row="0">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"></ColumnDefinition>
                                 <ColumnDefinition></ColumnDefinition>
                                 <ColumnDefinition Width="Auto"></ColumnDefinition>
                             </Grid.ColumnDefinitions>
-                            <Label Content="URI:"></Label>
-                            <TextBox Grid.Column="1"
-                                     Text="{Binding HtmlSourceUrl, UpdateSourceTrigger=PropertyChanged}"></TextBox>
-                            <Button Grid.Column="2" 
-                                    Content="Send and check"
-                                    Command="{Binding SendCommand}"></Button>
+                            <TextBlock Text="{Binding PopupSvc.PopupTitle}" 
+                                    Background="White"
+                                    Grid.Column="0"></TextBlock>
+                            <Button Content="x" 
+                            Width="20"
+                            Height="20"
+                            Command="{Binding PopupSvc.ClosePopupCmd}"
+                            Grid.Column="1"></Button>
                         </Grid>
-                        <Grid Grid.Row="1">
+                        <StackPanel Grid.Row="1">
+                            <TextBlock Text="{Binding PopupSvc.PopupCaption}" 
+                                    Background="White"
+                                    TextWrapping="WrapWithOverflow"></TextBlock>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </Popup>
+            <TabControl TabStripPlacement="Left" 
+                    Grid.Column="0" 
+                    Margin="0, 0, 0, 10">
+                <TabItem Name="TabItem_HtmlSource" Header="HTML Source">
+                    <TabItem.Content>
+                        <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"></RowDefinition>
                                 <RowDefinition></RowDefinition>
                                 <RowDefinition Height="Auto"></RowDefinition>
                             </Grid.RowDefinitions>
-                            <Label Grid.Row="0" Content="Your HTML here:"></Label>
+                            <Grid Grid.Row="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                    <ColumnDefinition></ColumnDefinition>
+                                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+                                <Label Content="URI:"></Label>
+                                <TextBox Grid.Column="1"
+                                     Text="{Binding HtmlSourceUrl, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                                <Button Grid.Column="2" 
+                                    Content="Send and check"
+                                    Command="{Binding SendCommand}"></Button>
+                            </Grid>
+                            <Grid Grid.Row="1">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"></RowDefinition>
+                                    <RowDefinition></RowDefinition>
+                                    <RowDefinition Height="Auto"></RowDefinition>
+                                </Grid.RowDefinitions>
                                 <Border Padding="10" Grid.Row="1">
                                     <ScrollViewer HorizontalScrollBarVisibility="Auto">
                                         <TextBox
                                             HorizontalScrollBarVisibility="Auto"
-                                            Name="tbMultiLine"
                                             AcceptsReturn="True"
                                             Text="{Binding MyRawHtml, UpdateSourceTrigger=PropertyChanged}"
                                             >
@@ -96,59 +94,109 @@
                                     </ScrollViewer>
                                 </Border>
                                 <Grid Grid.Row="2">
-                                <ListView ItemsSource="{Binding HtmlParseErrors}">
-                                    <ListView.View>
-                                        <GridView>
-                                            <GridViewColumn Width="Auto" Header="Line" DisplayMemberBinding="{Binding Line}"></GridViewColumn>
-                                            <GridViewColumn Width="Auto" Header="Position" DisplayMemberBinding="{Binding LinePosition}"></GridViewColumn>
-                                            <GridViewColumn Width="Auto" Header="Reason" DisplayMemberBinding="{Binding Reason}"></GridViewColumn>
-                                        </GridView>
-                                    </ListView.View>
-                                </ListView>
+                                    <ListView ItemsSource="{Binding HtmlParseErrors}">
+                                        <ListView.View>
+                                            <GridView>
+                                                <GridViewColumn Width="Auto" Header="Line" DisplayMemberBinding="{Binding Line}"></GridViewColumn>
+                                                <GridViewColumn Width="Auto" Header="Position" DisplayMemberBinding="{Binding LinePosition}"></GridViewColumn>
+                                                <GridViewColumn Width="Auto" Header="Reason" DisplayMemberBinding="{Binding Reason}"></GridViewColumn>
+                                            </GridView>
+                                        </ListView.View>
+                                    </ListView>
+                                </Grid>
+                            </Grid>
+                            <StackPanel Orientation="Horizontal" 
+                                    Grid.Row="2">
+                                <Button Content="Pretty" Command="{Binding PrettyCommand}"></Button>
+                                <Button Content="Check HTML" Command="{Binding CheckCommand}"></Button>
+                                <Button Content="Run" Command="{Binding RunCommand}"></Button>
+                            </StackPanel>
+                        </Grid>
+                    </TabItem.Content>
+                </TabItem>
+
+                <TabItem Name="TabItem_DocumentNode" Header="DocumentNode">
+                    <TabItem.Content>
+                        <Border>
+                            <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                                          VerticalScrollBarVisibility="Auto">
+                                <TextBlock TextWrapping="WrapWithOverflow" Text="{Binding DocumentNodeInnerHtml}">
+                                </TextBlock>
+                            </ScrollViewer>
+                        </Border>
+
+                    </TabItem.Content>
+                </TabItem>
+                <TabItem Name="TabItem_PrettyView" Header="Pretty View">
+                    <TabItem.Content>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"></ColumnDefinition>
+                                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+                            <Grid Grid.Column="0">
+                                <TreeView ItemsSource="{Binding HapNodes}">
+                                    <TreeView.Resources>
+                                        <HierarchicalDataTemplate DataType="{x:Type local:HapHtmlNode}" ItemsSource="{Binding ChildNodes}">
+                                            <Border BorderBrush="Red" BorderThickness="1" Padding="2" Margin="0 0 0 2" CornerRadius="8">
+                                                <TreeViewItem>
+                                                    <TreeViewItem.Header>
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <TextBlock Text="{Binding Name}"></TextBlock>
+                                                            <ListBox ItemsSource="{Binding Attributes}">
+                                                                <ListBox.Style>
+                                                                    <Style TargetType="ListBox">
+                                                                        <Setter Property="Visibility" Value="Visible"></Setter>
+                                                                        <Style.Triggers>
+                                                                            <DataTrigger Binding="{Binding Attributes.Count}" Value="0">
+                                                                                <Setter Property="Visibility" Value="Collapsed"></Setter>
+                                                                            </DataTrigger>
+                                                                        </Style.Triggers>
+                                                                    </Style>
+                                                                </ListBox.Style>
+                                                                <ListBox.ItemsPanel>
+                                                                    <ItemsPanelTemplate>
+                                                                        <StackPanel Orientation="Horizontal"></StackPanel>
+                                                                    </ItemsPanelTemplate>
+                                                                </ListBox.ItemsPanel>
+                                                                <ListBox.ItemTemplate>
+                                                                    <DataTemplate>
+                                                                        <TextBlock>
+                                                                            <TextBlock.Text>
+                                                                                <MultiBinding StringFormat="{}{0}: {1}">
+                                                                                    <Binding Path="Item1" />
+                                                                                    <Binding Path="Item2" />
+                                                                                </MultiBinding>
+                                                                            </TextBlock.Text>
+                                                                        </TextBlock>
+                                                                    </DataTemplate>
+                                                                </ListBox.ItemTemplate>
+                                                            </ListBox>
+                                                        </StackPanel>
+                                                    </TreeViewItem.Header>
+                                                </TreeViewItem>
+                                            </Border>
+                                        </HierarchicalDataTemplate>
+                                    </TreeView.Resources>
+                                </TreeView>
+                            </Grid>
+                            <Grid Grid.Column="1">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"></RowDefinition>
+                                    <RowDefinition></RowDefinition>
+                                </Grid.RowDefinitions>
+                                <UniformGrid Grid.Row="0" Columns="2" Rows="5">
+                                    <Label Content="Picked element name:"></Label>
+                                    <TextBox></TextBox>
+                                    <Label Content="XPath:"></Label>
+                                    <TextBox></TextBox>
+                                </UniformGrid>
                             </Grid>
                         </Grid>
-                        <StackPanel Orientation="Horizontal" 
-                                    Grid.Row="2">
-                            <Button Content="Check HTML"
-                                    Command="{Binding CheckCommand}"></Button>
-                            <Button Content="Run"></Button>
-                        </StackPanel>
-                    </Grid>
-                </TabItem.Content>
-            </TabItem>
 
-            <TabItem Name="TabItem_DocumentNode" Header="DocumentNode">
-                <TabItem.Content>
-                    <TextBlock TextWrapping="WrapWithOverflow">
-                        Actual inner HTML of Document Node...
-                    </TextBlock>
-                </TabItem.Content>
-            </TabItem>
-            <TabItem Name="TabItem_PrettyView" Header="Pretty View">
-                <TabItem.Content>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition></ColumnDefinition>
-                            <ColumnDefinition Width="Auto"></ColumnDefinition>
-                        </Grid.ColumnDefinitions>
-                        <Grid></Grid>
-                        <Grid Grid.Column="1">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"></RowDefinition>
-                                <RowDefinition></RowDefinition>
-                            </Grid.RowDefinitions>
-                            <UniformGrid Grid.Row="0" Columns="2" Rows="5">
-                                <Label Content="Picked element name:"></Label>
-                                <TextBox></TextBox>
-                                <Label Content="XPath:"></Label>
-                                <TextBox></TextBox>
-                            </UniformGrid>
-                        </Grid>
-                    </Grid>
-
-                </TabItem.Content>
-            </TabItem>
-        </TabControl>
-    </Grid>
+                    </TabItem.Content>
+                </TabItem>
+            </TabControl>
+        </Grid>
     </Border>
 </Window>
